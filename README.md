@@ -59,7 +59,7 @@ You can get this table on your system using `getports.sh`:
 
 | Coin  | RPC port | ZMQ port | Web port | P2P port | Magic (hex) | Magic (dec) 
 | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |------------- |
-| KMD | 8232 | 8332 | 3001 | 7771 |
+| KMD | 8232 | 8332 | 3001 | **7770** | 0x8de4eef9 |  2380590841
 | REVS | 8233 (8233) | 8333 | 3002 | 10195 | 0x4141771a | 1094809370 |
 | SUPERNET | 8234 (8234) | 8334 | 3003 | 11340 | 0xb9112456 | -1190058922 |
 | DEX | 8235 (8235) | 8335 | 3004 | 11889 | 0x0ace51e0 | 181293536 |
@@ -89,7 +89,19 @@ You can get this table on your system using `getports.sh`:
 | PRLPAY | 8259 (8259) | 8359 | 3028 | 9678 | 0x61f88ac5 | 1643678405 |
 | DSEC | 8260 (8260) | 8360 | 3029 | 11556 | 0xc7b2a699 | -944593255 |
 
+### Related resources
+
+- [Join](https://komodoplatform.com/#joinslack) [Komodo](https://komodoplatform.com/) Slack [#insight](https://komodo-platform.slack.com/messages/CAB026RK9)  channel to get more information.
+- Read more about Insight API [here](https://github.com/bitpay/insight-api).
+- Read about Web Socket API [here](https://github.com/bitpay/insight-api#web-socket-api).
+
+### Feel free to contribute
+
+Pull requests with logos, color schemes, fixes and any other contributions are welcome.
+
 ### To do
 
 Later i will add some useful scripts and nginx configuration example.
+
+
 
