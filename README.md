@@ -89,6 +89,35 @@ You can get this table on your system using `getports.sh`:
 | PRLPAY | 8259 (8259) | 8359 | 3028 | 9678 | 0x61f88ac5 | 1643678405 |
 | DSEC | 8260 (8260) | 8360 | 3029 | 11556 | 0xc7b2a699 | -944593255 |
 
+### Nginx config examples
+
+- **Simple (HTTP only): **
+
+```
+	server {
+	  listen 80;
+	  server_name yourhostname.com;
+	
+	  root /home/user/insight;
+	  access_log /home/user/insight-log/livenet-access.log;
+	  error_log /home/user/insight-log/livenet-error.log;
+	
+	  location / {
+	    proxy_pass http://localhost:3001;
+	    proxy_http_version 1.1;
+	    proxy_set_header Upgrade $http_upgrade;
+	    proxy_set_header Connection 'upgrade';
+	    proxy_set_header Host $host;
+	    proxy_cache_bypass $http_upgrade;
+	    proxy_set_header X-Real-IP  $remote_addr;
+	    proxy_set_header X-Forwarded-For $remote_addr;
+	  }
+```	  
+	  
+- **Simple (HTTP + HTTPS): **
+
+Will be here soon ;)	  
+
 ### Related resources
 
 - [Join](https://komodoplatform.com/#joinslack) [Komodo](https://komodoplatform.com/) Slack [#insight](https://komodo-platform.slack.com/messages/CAB026RK9)  channel to get more information.
