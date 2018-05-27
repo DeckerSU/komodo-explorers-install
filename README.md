@@ -5,7 +5,7 @@
 Explorer uses [https://github.com/jl777/komodo](https://github.com/jl777/komodo) **dev** branch komodod (as it already included all needed for bitcore insight: `txindex`, `addressindex`, `timestampindex`,
 `spentindex` and zmq support). 
 
-Installation is fully automated, just launch `install_explorer.sh` script from this repo. It will install needed dependencies, download and compile komodod source, install correct version of NodeJS and create KMD and all assets explorer folders and launch scripts.
+Installation is fully automated, just launch `install-explorer.sh` script from this repo. It will install needed dependencies, download and compile komodod source, install correct version of NodeJS and create KMD and all assets explorer folders and launch scripts.
 
 Also, during installation it will used following node-js modules from this repo:
 
@@ -50,7 +50,7 @@ After `./install-explorer.sh` finished his work you will end up with following d
 
 Corresponding daemons (komodod) for assets will be already started (see last step of ./install-explorer.sh).
 
-After install step is complete run `assets_changes.sh` to change block reward display
+After install step is complete run `assets-changes.sh` to change block reward display
 for assets to 0.0001 and change assetname in explorer.
 
 ### Ports Table
