@@ -91,7 +91,7 @@ You can get this table on your system using `getports.sh`:
 
 ### Nginx config examples
 
-- **Simple (HTTP only): **
+- **Simple (HTTP only):**
 
 ```
 	server {
@@ -114,7 +114,7 @@ You can get this table on your system using `getports.sh`:
 	  }
 ```	  
 	  
-- **Simple (HTTP + HTTPS): **
+- **Simple (HTTP + HTTPS):**
 
 Will be here soon ;)	  
 
