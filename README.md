@@ -92,6 +92,44 @@ You can get this table on your system using `getports.sh`:
 | EQL | 8262 (8262) | 8362 | 3031 | 10305 | 0x58e490b8 | 1491374264 |
 | VRSC | 8263 (8263) | 8363 | 3032 | 27485 | 0xe2588aad | -497513811 |
 
+### ufw rules
+
+	sudo ufw allow 7770/tcp comment 'KMD p2p port'
+	sudo ufw allow 10195/tcp comment 'REVS p2p port'
+	sudo ufw allow 11340/tcp comment 'SUPERNET p2p port'
+	sudo ufw allow 11889/tcp comment 'DEX p2p port'
+	sudo ufw allow 14067/tcp comment 'PANGEA p2p port'
+	sudo ufw allow 15105/tcp comment 'JUMBLR p2p port'
+	sudo ufw allow 14249/tcp comment 'BET p2p port'
+	sudo ufw allow 8515/tcp comment 'CRYPTO p2p port'
+	sudo ufw allow 14430/tcp comment 'HODL p2p port'
+	sudo ufw allow 8845/tcp comment 'MSHARK p2p port'
+	sudo ufw allow 11963/tcp comment 'BOTS p2p port'
+	sudo ufw allow 12385/tcp comment 'MGW p2p port'
+	sudo ufw allow 14275/tcp comment 'COQUI p2p port'
+	sudo ufw allow 12166/tcp comment 'WLC p2p port'
+	sudo ufw allow 8298/tcp comment 'KV p2p port'
+	sudo ufw allow 11115/tcp comment 'CEAL p2p port'
+	sudo ufw allow 9454/tcp comment 'MESH p2p port'
+	sudo ufw allow 14336/tcp comment 'MNZ p2p port'
+	sudo ufw allow 12926/tcp comment 'AXO p2p port'
+	sudo ufw allow 10270/tcp comment 'ETOMIC p2p port'
+	sudo ufw allow 8799/tcp comment 'BTCH p2p port'
+	sudo ufw allow 11607/tcp comment 'PIZZA p2p port'
+	sudo ufw allow 8922/tcp comment 'BEER p2p port'
+	sudo ufw allow 8426/tcp comment 'NINJA p2p port'
+	sudo ufw allow 12466/tcp comment 'OOT p2p port'
+	sudo ufw allow 14357/tcp comment 'BNTN p2p port'
+	sudo ufw allow 15586/tcp comment 'CHAIN p2p port'
+	sudo ufw allow 9678/tcp comment 'PRLPAY p2p port'
+	sudo ufw allow 11556/tcp comment 'DSEC p2p port'
+	sudo ufw allow 15722/tcp comment 'GLXT p2p port'
+	sudo ufw allow 10305/tcp comment 'EQL p2p port'
+	sudo ufw allow 27485/tcp comment 'VRSC p2p port'
+	# sudo ufw allow from any to any port 3001:3032 proto tcp comment 'allow insight web ports'
+	
+	
+
 ### Nginx config examples
 
 - **Simple (HTTP only):**
@@ -117,9 +155,9 @@ You can get this table on your system using `getports.sh`:
 	  }
 ```	  
 	  
-- **Simple (HTTP + HTTPS):**
+- **HTTP + HTTPS + redirect HTTP->HTTPS + rate limiter + Let's Encrypt support**
 
-Will be here soon ;)	  
+Run `helper.sh`, your configs examples will be available in `helper/nginx/sites-available `.  
 
 ### Related resources
 
@@ -131,9 +169,13 @@ Will be here soon ;)
 
 Pull requests with logos, color schemes, fixes and any other contributions are welcome.
 
-### To do
+### Other
 
-Later i will add some useful scripts and nginx configuration example.
+Note: you should build VRSC komodod (verusd) manually, also make sure that you run VRSC daemon with correct parameters.
+
+Follow this: https://github.com/VerusCoin/VerusCoin/blob/master/src/verusd to check params.
+
+VRSC will not work with original komodod from Komodo repo!
 
 
 
