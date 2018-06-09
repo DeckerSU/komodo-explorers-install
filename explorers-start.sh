@@ -16,3 +16,6 @@ for i in "${kmd_coins[@]}"
 do
     screen -d -m -S $i-explorer $CUR_DIR/$i-explorer-start.sh
 done
+
+# start KMD explorer
+screen -d -m -S KMD-explorer $CUR_DIR/KMD-explorer-start.sh
