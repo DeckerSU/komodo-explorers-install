@@ -158,7 +158,8 @@ EOF
 chmod +x KMD-explorer-start.sh
 
 # now we need to create assets configs for komodod and create explorers for each asset
-declare -a kmd_coins=(REVS SUPERNET DEX PANGEA JUMBLR BET CRYPTO HODL MSHARK BOTS MGW COQUI WLC KV CEAL MESH MNZ AXO ETOMIC BTCH PIZZA BEER NINJA OOT BNTN CHAIN PRLPAY DSEC GLXT EQL)
+#declare -a kmd_coins=(REVS SUPERNET DEX PANGEA JUMBLR BET CRYPTO HODL MSHARK BOTS MGW COQUI WLC KV CEAL MESH MNZ AXO ETOMIC BTCH PIZZA BEER NINJA OOT BNTN CHAIN PRLPAY DSEC GLXT EQL)
+source $CUR_DIR/kmd_coins.sh
 #declare -a kmd_coins=(REVS)
 
 for i in "${kmd_coins[@]}"

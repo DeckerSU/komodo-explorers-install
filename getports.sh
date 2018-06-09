@@ -1,5 +1,7 @@
 #!/bin/bash
 
+CUR_DIR=$(pwd)
+
 echo '
 | Coin  | RPC port | ZMQ port | Web port | P2P port | Magic (hex) | Magic (dec) 
 | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |------------- |
@@ -9,7 +11,8 @@ rpcport=8232
 zmqport=8332
 webport=3001
 
-declare -a kmd_coins=(REVS SUPERNET DEX PANGEA JUMBLR BET CRYPTO HODL MSHARK BOTS MGW COQUI WLC KV CEAL MESH MNZ AXO ETOMIC BTCH PIZZA BEER NINJA OOT BNTN CHAIN PRLPAY DSEC GLXT EQL)
+#declare -a kmd_coins=(REVS SUPERNET DEX PANGEA JUMBLR BET CRYPTO HODL MSHARK BOTS MGW COQUI WLC KV CEAL MESH MNZ AXO ETOMIC BTCH PIZZA BEER NINJA OOT BNTN CHAIN PRLPAY DSEC GLXT EQL)
+source $CUR_DIR/kmd_coins.sh
 
 for i in "${kmd_coins[@]}"
 do
