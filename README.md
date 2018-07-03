@@ -88,9 +88,11 @@ You can get this table on your system using `getports.sh`:
 | CHAIN | 8258 (8258) | 8358 | 3027 | 15586 | 0xe0a98e56 | -525758890 |
 | PRLPAY | 8259 (8259) | 8359 | 3028 | 9678 | 0x61f88ac5 | 1643678405 |
 | DSEC | 8260 (8260) | 8360 | 3029 | 11556 | 0xc7b2a699 | -944593255 |
-| GLXT | 8261 (8261) | 8361 | 3030 | 15722 | 0x40bbee0b | 1086057995 |
+| GLXT | 8261 (8261) | 8361 | 3030 | 13108 | 0x1865ac2b | 409316395 |
 | EQL | 8262 (8262) | 8362 | 3031 | 10305 | 0x58e490b8 | 1491374264 |
 | VRSC | 8263 (8263) | 8363 | 3032 | 27485 | 0xe2588aad | -497513811 |
+| ZILLA | 8264 (8264) | 8364 | 3033 | 10040 | 0x204ddb91 | 541973393 |
+| RFOX | 8265 (8265) | 8365 | 3034 | 32268 | 0x4406ad4c | 1141288268 |
 
 ### ufw rules
 
@@ -126,8 +128,9 @@ You can get this table on your system using `getports.sh`:
 	sudo ufw allow 15722/tcp comment 'GLXT p2p port'
 	sudo ufw allow 10305/tcp comment 'EQL p2p port'
 	sudo ufw allow 27485/tcp comment 'VRSC p2p port'
-	# sudo ufw allow from any to any port 3001:3032 proto tcp comment 'allow insight web ports'
-	
+	sudo ufw allow 10040/tcp comment 'ZILLA p2p port'
+	sudo ufw allow 32268/tcp comment 'RFOX p2p port'
+	# sudo ufw allow from any to any port 3001:3034 proto tcp comment 'allow insight web ports'	
 	
 
 ### Nginx config examples
