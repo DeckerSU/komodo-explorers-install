@@ -1,0 +1,78 @@
+<div class="alert alert-danger" data-ng-show="flashMessage">
+  {{$root.flashMessage}}
+</div>
+<div data-ng-include src="'views/includes/connection.html'"></div>
+<section data-ng-controller="IndexController" data-ng-init="index()">
+  <div class="container">
+    <div id="home" class="row">
+      <div class="col-xs-12 col-md-8">
+
+        <div id="search-form-mobile" class="visible-xs" data-ng-include src="'views/includes/search.html'"></div>
+
+        <h1 translate>Latest Blocks</h1>
+        <table class="table table-hover table-striped" style="table-layout: fixed">
+          <thead>
+            <tr>
+              <th translate>Height</th>
+              <th translate>Age</th>
+              <th class="text-right"><span class="ellipsis" translate>Transactions</span></th>
+              <th class="text-right hidden-xs"><span class="ellipsis" translate>Mined by</span></th>
+              <th class="text-right" translate>Size</th>
+            </tr>
+          </thead>
+          <tbody>
+          <tr data-ng-show="!blocks.length"><td colspan="4" translate>Waiting for blocks...</td></tr>
+          <tr class="fader" data-ng-repeat='b in blocks'>
+            <td>
+              <a href="block/{{b.hash}}">{{b.height}}</a>
+            </td>
+            <td><span class="ellipsis">{{humanSince(b.time)}}</span></td>
+            <td class="text-right">{{b.txlength}}</td>
+            <td class="text-right hidden-xs"><a href="{{b.poolInfo.url}}" title="{{b.poolInfo.poolName}}" target="_blank" data-ng-show="b.poolInfo">{{b.poolInfo.poolName}}</a></td>
+            <td class="text-right">{{b.size}}</td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="btn-more">
+          <a href="blocks" class="btn btn-default" translate>See all blocks</a>
+        </div>
+
+        <h2 translate>Latest Transactions</h2>
+
+        <table class="table table-hover table-striped" style="table-layout: fixed;">
+          <thead>
+            <tr>
+              <th>Hash</th>
+              <th class="text-right" translate>Value Out</th>
+            </tr>
+          </thead>
+          <tbody>
+          <tr data-ng-show="!txs.length"><td colspan="3" translate>Waiting for transactions...</td></tr>
+          <tr class="fader" data-ng-repeat='tx in txs'>
+            <td>
+              <a class="ellipsis" href="tx/{{tx.txid}}">{{tx.txid}}</a>
+            </td>
+            <td class="text-right"><span class="ellipsis">{{$root.currency.getConvertion(tx.valueOut)}}</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="col-xs-12 col-md-4 col-gray">
+        <h2 translate>What is ChainZilla?</h2>
+        <p id="intro" translate><strong>ChainZilla</strong> is a 4th gen DIY blockchain service provider of Komodo Assetchains, Altcoins, and ERC20 Tokens. No programming needed!</p>
+        <p class="subIntro" translate>ChainZilla's mission is to become the standard in development of DIY solutions, decentralized applications, and blockchain deployment.</p>
+        <p class="subIntro">Learn more on <a href="https://www.chainzilla.io/" target="_blank" title="ZILLA">ChainZilla.io</a></p>
+        <p data-ng-if='currency.testnet'><strong>This explorer is currently showing the live Komodo network!</strong></p>
+        <a class="twitter-timeline" href="https://twitter.com/Chainzillaio" data-tweet-limit="3">Tweets by ChainZilla.IO</a>
+        <div id="powered" class="row">
+          <div class="powered-text">
+            <small class="text-muted" translate>Powered by</small>
+          </div>
+          <a href="https://www.chainzilla.io/" target="_blank" class="supernet" title="ChainZilla" alt="ChainZilla"></a>
+        </div>
+      </div> <!-- END OF COL-3 -->
+    </div>
+  </div>
+</section>
