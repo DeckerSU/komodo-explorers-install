@@ -94,6 +94,7 @@ You can get this table on your system using `getports.sh`:
 | ZILLA | 8264 (8264) | 8364 | 3033 | 10040 | 0x204ddb91 | 541973393 |
 | RFOX | 8265 (8265) | 8365 | 3034 | 32268 | 0x4406ad4c | 1141288268 |
 | SEC | 8266 (8266) | 8366 | 3035 | 11539 | 0x8f27938c | -1893231732 |
+| CCL | 8267 (8267) | 8367 | 3036 | 20848 | 0x66ff315c | 1728000348 |
 
 
 ### ufw rules
@@ -133,7 +134,8 @@ You can get this table on your system using `getports.sh`:
 	sudo ufw allow 10040/tcp comment 'ZILLA p2p port'
 	sudo ufw allow 32268/tcp comment 'RFOX p2p port'
 	sudo ufw allow 11539/tcp comment 'SEC p2p port'
-	# sudo ufw allow from any to any port 3001:3035 proto tcp comment 'allow insight web ports'
+	sudo ufw allow 20848/tcp comment 'CCL p2p port'
+	# sudo ufw allow from any to any port 3001:3036 proto tcp comment 'allow insight web ports'
 	
 	
 
