@@ -95,7 +95,9 @@ You can get this table on your system using `getports.sh`:
 | RFOX | 8265 (8265) | 8365 | 3034 | 32268 | 0x4406ad4c | 1141288268 |
 | SEC | 8266 (8266) | 8366 | 3035 | 11539 | 0x8f27938c | -1893231732 |
 | CCL | 8267 (8267) | 8367 | 3036 | 20848 | 0x66ff315c | 1728000348 |
-
+| PIRATE | 8268 (8268) | 8368 | 3037 | 45452 | 0x17b6e058 | 397860952 |
+| MGNX | 8269 (8269) | 8369 | 3038 | 20730 | 0xdf236aa6 | -551327066 |
+| PGT | 8270 (8270) | 8370 | 3039 | 46704 | 0xc87e0d8c | -931263092 |
 
 ### ufw rules
 
@@ -135,8 +137,10 @@ You can get this table on your system using `getports.sh`:
 	sudo ufw allow 32268/tcp comment 'RFOX p2p port'
 	sudo ufw allow 11539/tcp comment 'SEC p2p port'
 	sudo ufw allow 20848/tcp comment 'CCL p2p port'
-	# sudo ufw allow from any to any port 3001:3036 proto tcp comment 'allow insight web ports'
-	
+	sudo ufw allow 45452/tcp comment 'PIRATE p2p port'
+	sudo ufw allow 20730/tcp comment 'MGNX p2p port'
+	sudo ufw allow 46704/tcp comment 'PGT p2p port'
+	# sudo ufw allow from any to any port 3001:3039 proto tcp comment 'allow insight web ports'	
 	
 
 ### Nginx config examples
