@@ -174,7 +174,7 @@ Run `helper.sh`, your configs examples will be available in `helper/nginx/sites-
 
 ### Related resources
 
-- [Join](https://komodoplatform.com/#joinslack) [Komodo](https://komodoplatform.com/) Slack [#insight](https://komodo-platform.slack.com/messages/CAB026RK9)  channel to get more information.
+- [Join Komodo Discord](https://komodoplatform.com/discord) #developer channel to get more information.
 - Read more about Insight API [here](https://github.com/bitpay/insight-api).
 - Read about Web Socket API [here](https://github.com/bitpay/insight-api#web-socket-api).
 
