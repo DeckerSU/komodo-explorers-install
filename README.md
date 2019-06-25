@@ -71,7 +71,7 @@ You can get this table on your system using `getports.sh`:
 | MSHARK | 8241 (8241) | 8341 | 3010 | 8845 | 0x9ef4e9f0 | -1628116496 |
 | BOTS | 8242 (8242) | 8342 | 3011 | 11963 | 0x042956ec | 69818092 |
 | MGW | 8243 (8243) | 8343 | 3012 | 12385 | 0xa796157c | -1483336324 |
-| COQUI | 8244 (8244) | 8344 | 3013 | 14275 | 0xdf23f344 | -551292092 |
+| COQUICASH | 8244 (8244) | 8344 | 3013 | 19711 | 0xd0d1e19f | -791551585 |
 | WLC | 8245 (8245) | 8345 | 3014 | 12166 | 0x00592ed5 | 5844693 |
 | KV | 8246 (8246) | 8346 | 3015 | 8298 | 0xc5f134f4 | -974048012 |
 | CEAL | 8247 (8247) | 8347 | 3016 | 11115 | 0x905f8c09 | -1872786423 |
@@ -113,7 +113,7 @@ You can get this table on your system using `getports.sh`:
 	sudo ufw allow 8845/tcp comment 'MSHARK p2p port'
 	sudo ufw allow 11963/tcp comment 'BOTS p2p port'
 	sudo ufw allow 12385/tcp comment 'MGW p2p port'
-	sudo ufw allow 14275/tcp comment 'COQUI p2p port'
+	sudo ufw allow 19711/tcp comment 'COQUICASH p2p port'
 	sudo ufw allow 12166/tcp comment 'WLC p2p port'
 	sudo ufw allow 8298/tcp comment 'KV p2p port'
 	sudo ufw allow 11115/tcp comment 'CEAL p2p port'
