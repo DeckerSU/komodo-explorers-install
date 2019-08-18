@@ -970,6 +970,18 @@ a:hover, a:focus {
     /* font-weight: bold; */
 }
 
+@media (max-width: 767px) {
+    .txvalues-success {
+        background: none;
+        font-weight: bold;
+    }
+    
+    .txvalues-primary {
+        background: none;
+        font-weight: bold;
+    }
+}
+
 .status {
     background-color: #3CC9BF;
 }
@@ -1028,4 +1040,12 @@ a:hover, a:focus {
 
 .transaction-vin-vout .ellipsis a.ng-binding {
     color: #3CC9BF;
+}
+
+.navbar-default .navbar-toggle {
+    border-color:#182331;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+    background-color:#182331;
 }
