@@ -1,0 +1,80 @@
+<div class="alert alert-danger" data-ng-show="flashMessage">
+  {{$root.flashMessage}}
+</div>
+<div data-ng-include src="'views/includes/connection.html'"></div>
+<section data-ng-controller="IndexController" data-ng-init="index()">
+  <div class="container">
+    <div id="home" class="row">
+      <div class="col-xs-12 col-md-8">
+
+        <div id="search-form-mobile" class="visible-xs" data-ng-include src="'views/includes/search.html'"></div>
+
+        <h1 translate>Latest Blocks</h1>
+        <table class="table" style="table-layout: fixed">
+          <thead>
+            <tr>
+              <th translate>Height</th>
+              <th translate>Age</th>
+              <th class="text-right"><span class="ellipsis" translate>Transactions</span></th>
+              <th class="text-right hidden-xs"><span class="ellipsis" translate>Mined by</span></th>
+              <th class="text-right" translate>Size</th>
+            </tr>
+          </thead>
+          <tbody>
+          <tr data-ng-show="!blocks.length"><td colspan="4" translate>Waiting for blocks...</td></tr>
+          <tr class="fader" data-ng-repeat='b in blocks'>
+            <td>
+              <a href="block/{{b.hash}}">{{b.height}}</a>
+            </td>
+            <td><span class="ellipsis">{{humanSince(b.time)}}</span></td>
+            <td class="text-right">{{b.txlength}}</td>
+            <td class="text-right hidden-xs"><a href="{{b.poolInfo.url}}" title="{{b.poolInfo.poolName}}" target="_blank" data-ng-show="b.poolInfo">{{b.poolInfo.poolName}}</a></td>
+            <td class="text-right">{{b.size}}</td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="btn-more">
+          <a href="blocks" class="btn btn-default" translate>See all blocks</a>
+        </div>
+
+        <h2 translate>Latest Transactions</h2>
+
+        <table class="table" style="table-layout: fixed;">
+          <thead>
+            <tr>
+              <th>Hash</th>
+              <th class="text-right" translate>Value Out</th>
+            </tr>
+          </thead>
+          <tbody>
+          <tr data-ng-show="!txs.length"><td colspan="3" translate>Waiting for transactions...</td></tr>
+          <tr class="fader" data-ng-repeat='tx in txs'>
+            <td>
+              <a class="ellipsis" href="tx/{{tx.txid}}">{{tx.txid}}</a>
+            </td>
+            <td class="text-right"><span class="ellipsis">{{$root.currency.getConvertion(tx.valueOut)}}</span></td>
+          </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="col-xs-12 col-md-4 col-gray">
+        <h2 translate=""><span class="ng-scope">Composable Blockchain Solutions</span></h2>
+        <p id="intro">With Komodo, you can deploy a composable Smart Chain in minutes with seamless interoperability, atomic swaps, and Turing-complete business logic.</p>
+        <p class="subIntro" translate=""><span class="ng-scope">Komodo’s </span><a href="https://komodoplatform.com/antara-framework-rebrand-ama" target="_blank" title="Antara Framework" class="ng-scope">Antara Framework</a><span class="ng-scope"> is an adaptable framework for simple, end-to-end blockchain development. Antara makes it easier than ever before to launch a chain, activate modules, and start building blockchain-based applications.</span></p>
+        <p class="subIntro last" translate=""><span class="ng-scope">Smart Chains are compatible with Komodo’s </span><a href="https://komodoplatform.com/atomic-swaps" target="_blank" title="Cross-chain atomic swap technology" class="ng-scope">cross-chain atomic swap technology</a><span class="ng-scope">. Next-generation wallets, such as Komodo’s </span><a href="https://atomicdex.io" target="_blank" title="AtomicDEX Wallet" class="ng-scope">AtomicDEX application</a><span class="ng-scope">, allow users to trade assets wallet-to-wallet without any middlemen or third-parties.</span></p>
+        
+        <!-- ngIf: currency.testnet -->
+        <!--<a class="twitter-timeline" href="https://twitter.com/KomodoPlatform">Tweets by KomodoPlatform</a>--><p></p>
+        <div id="powered" class="row">
+          <div class="powered-text">
+            <small class="text-muted" translate=""><span class="ng-scope">Powered by</span></small>
+          </div>
+          <!-- <a href="https://supernet.org/" target="_blank" class="supernet" title="SuperNET"></a> -->
+          <a href="https://komodoplatform.com" target="_blank" class="komodoplatform" title="Komodo Platform"></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
