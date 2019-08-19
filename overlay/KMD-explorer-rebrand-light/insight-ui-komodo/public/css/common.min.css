@@ -1049,3 +1049,7 @@ a:hover, a:focus {
 .navbar-default .navbar-toggle .icon-bar {
     background-color:#182331;
 }
+.v_highlight {
+    background-color: #fff;
+    color: #333;
+}
