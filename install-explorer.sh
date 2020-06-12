@@ -54,7 +54,7 @@ echo -e "$STEP_START[ Step 3 ]$STEP_END Installing NodeJS and Bitcore Node"
 #git clone https://github.com/DeckerSU/bitcore-build-komodo
 
 # install nodejs, n and other stuff
-sudo apt --yes install libsodium-dev npm
+sudo apt --yes install libsodium-dev
 sudo apt --yes install libzmq3-dev
 # sudo npm install n -g
 # sudo n stable
@@ -63,6 +63,7 @@ sudo apt --yes install libzmq3-dev
 wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.35.0/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
+
 # switch node setup with nvm
 nvm install v4
 # https://stackoverflow.com/questions/17509669/how-to-install-an-npm-package-from-github-directly
