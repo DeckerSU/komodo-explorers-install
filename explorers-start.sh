@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 STEP_START='\e[1;47;42m'
 STEP_END='\e[0m'
@@ -14,7 +14,9 @@ kill -9 $(pidof bitcore)
 source $CUR_DIR/kmd_coins.sh
 for i in "${kmd_coins[@]}"
 do
-    screen -d -m -S $i-explorer $CUR_DIR/$i-explorer-start.sh
+    if [[ ! " ${disabled_coins[@]} " =~ " ${i} " ]]; then
+        screen -d -m -S $i-explorer $CUR_DIR/$i-explorer-start.sh
+    fi
 done
 
 # start KMD explorer

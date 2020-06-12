@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
-# (c) Decker, 2018
+# (c) Decker, 2018-2020
 #
 
 # Additional info:
@@ -18,30 +18,31 @@ CUR_DIR=$(pwd)
 echo Current directory: $CUR_DIR
 echo -e "$STEP_START[ Step 1 ]$STEP_END Installing dependencies"
 sudo apt --yes install git
-sudo apt --yes install build-essential pkg-config libc6-dev libevent-dev m4 g++-multilib autoconf libtool libncurses5-dev unzip git python zlib1g-dev wget bsdmainutils automake libboost-all-dev libssl-dev libprotobuf-dev protobuf-compiler libqt4-dev libqrencode-dev libdb++-dev ntp ntpdate
+# sudo apt --yes install build-essential pkg-config libc6-dev libevent-dev m4 g++-multilib autoconf libtool libncurses5-dev unzip git python zlib1g-dev wget bsdmainutils automake libboost-all-dev libssl-dev libprotobuf-dev protobuf-compiler libqt4-dev libqrencode-dev libdb++-dev ntp ntpdate
+sudo apt --yes install build-essential pkg-config libc6-dev m4 g++-multilib autoconf libtool ncurses-dev unzip git python python-zmq zlib1g-dev wget libcurl4-gnutls-dev bsdmainutils automake curl libsodium-dev
 sudo apt --yes install libcurl4-gnutls-dev
-sudo apt --yes install curl
+sudo apt --yes install curl wget
 
 echo -e "$STEP_START[ Step 2 ]$STEP_END Building komodod"
 
 #if false; then
-
-git clone -b dev https://github.com/jl777/komodo
-cd $CUR_DIR/komodo
-zcutil/build.sh -j$(nproc)
-cd $CUR_DIR
-
-if [ -f "$HOME/.zcash-params/sprout-proving.key" ] && [ -f "$HOME/.zcash-params/sprout-verifying.key" ];
-then
-    echo Sprout files already here ...
+if [ -f "$CUR_DIR/komodo/src/komodod" ]; then
+    echo "Komodo daemon binary already there, don't need to build ..."
 else
+    git clone -b dev https://github.com/KomodoPlatform/komodo
     cd $CUR_DIR/komodo
-    zcutil/fetch-params.sh
+    zcutil/build.sh -j$(nproc)
     cd $CUR_DIR
+
+    if [ -f "$HOME/.zcash-params/sprout-proving.key" ] && [ -f "$HOME/.zcash-params/sprout-verifying.key" ];
+    then
+        echo Sprout files already here ...
+    else
+        cd $CUR_DIR/komodo
+        zcutil/fetch-params.sh
+        cd $CUR_DIR
+    fi
 fi
-
-
-#fi
 
 echo -e "$STEP_START[ Step 3 ]$STEP_END Installing NodeJS and Bitcore Node"
 #git clone https://github.com/DeckerSU/bitcore-node-komodo
@@ -53,24 +54,23 @@ echo -e "$STEP_START[ Step 3 ]$STEP_END Installing NodeJS and Bitcore Node"
 #git clone https://github.com/DeckerSU/bitcore-build-komodo
 
 # install nodejs, n and other stuff
-sudo apt --yes install libsodium-dev npm
+sudo apt --yes install libsodium-dev
 sudo apt --yes install libzmq3-dev
 # sudo npm install n -g
 # sudo n stable
 
-# install nvm
-wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
+# install nvm # https://github.com/nvm-sh/nvm#install--update-script
+wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.35.0/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" # This loads nvm
+
 # switch node setup with nvm
 nvm install v4
 # https://stackoverflow.com/questions/17509669/how-to-install-an-npm-package-from-github-directly
 
 npm install git+https://git@github.com/DeckerSU/bitcore-node-komodo # npm install bitcore
 
-
 echo -e "$STEP_START[ Step 4 ]$STEP_END Creating komodod configs and deploy explorers"
-
 
 # Start ports
 rpcport=8232
@@ -169,6 +169,9 @@ do
    zmqport=$((zmqport+1))
    webport=$((webport+1))
    #printf "%10s: rpc.$rpcport zmq.$zmqport web.$webport\n" $i
+
+  if [[ ! " ${disabled_coins[@]} " =~ " ${i} " ]]; then # install only if coin not disabled
+
    mkdir -p $HOME/.komodo/$i
    touch $HOME/.komodo/$i/$i.conf
 cat <<EOF > $HOME/.komodo/$i/$i.conf
@@ -245,11 +248,12 @@ cd $i-explorer
 nvm use v4; ./node_modules/bitcore-node-komodo/bin/bitcore-node start
 EOF
 chmod +x $i-explorer-start.sh
+fi # install only if coin not disabled
 
 done
 
 echo -e "$STEP_START[ Step 5 ]$STEP_END Launching daemons"
-cd $CUR_DIR/komodo/src
-echo "pubkey=028eea44a09674dda00d88ffd199a09c9b75ba9782382cc8f1e97c0fd565fe5707" > pubkey.txt # remove this if you are not Decker :)
-./assetchains
+# cd $CUR_DIR/komodo/src
+# echo "pubkey=028eea44a09674dda00d88ffd199a09c9b75ba9782382cc8f1e97c0fd565fe5707" > pubkey.txt # remove this if you are not Decker :)
+# ./assetchains
 cd $CUR_DIR
