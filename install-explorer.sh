@@ -26,20 +26,23 @@ sudo apt --yes install curl wget
 echo -e "$STEP_START[ Step 2 ]$STEP_END Building komodod"
 
 #if false; then
-git clone -b dev https://github.com/KomodoPlatform/komodo
-cd $CUR_DIR/komodo
-zcutil/build.sh -j$(nproc)
-cd $CUR_DIR
-
-if [ -f "$HOME/.zcash-params/sprout-proving.key" ] && [ -f "$HOME/.zcash-params/sprout-verifying.key" ];
-then
-    echo Sprout files already here ...
+if [ -f "$CUR_DIR/komodo/src/komodod" ]; then
+    echo "Komodo daemon binary already there, don't need to build ..."
 else
+    git clone -b dev https://github.com/KomodoPlatform/komodo
     cd $CUR_DIR/komodo
-    zcutil/fetch-params.sh
+    zcutil/build.sh -j$(nproc)
     cd $CUR_DIR
+
+    if [ -f "$HOME/.zcash-params/sprout-proving.key" ] && [ -f "$HOME/.zcash-params/sprout-verifying.key" ];
+    then
+        echo Sprout files already here ...
+    else
+        cd $CUR_DIR/komodo
+        zcutil/fetch-params.sh
+        cd $CUR_DIR
+    fi
 fi
-#fi
 
 echo -e "$STEP_START[ Step 3 ]$STEP_END Installing NodeJS and Bitcore Node"
 #git clone https://github.com/DeckerSU/bitcore-node-komodo
