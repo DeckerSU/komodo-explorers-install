@@ -21,9 +21,11 @@ source $CUR_DIR/kmd_coins.sh
 for i in "${kmd_coins[@]}"
 do
     echo -e "$STEP_START[ $i ]$STEP_END"
-    cd $CUR_DIR/$i-explorer
-    nvm use v4; npm update
-    cd $CUR_DIR
+    if [[ ! " ${disabled_coins[@]} " =~ " ${i} " ]]; then
+        cd $CUR_DIR/$i-explorer
+        nvm use v4; npm update
+        cd $CUR_DIR
+    fi
 done
 
 # now we are ready to make assetchains specific changes
