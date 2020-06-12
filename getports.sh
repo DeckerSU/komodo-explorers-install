@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 CUR_DIR=$(pwd)
 
 echo '
-| Coin  | RPC port | ZMQ port | Web port | P2P port | Magic (hex) | Magic (dec) 
-| ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |------------- |
-| KMD | 8232 | 8332 | 3001 | **7770** | 0x8de4eef9 |  2380590841|'
+|   | Coin  | RPC port | ZMQ port | Web port | P2P port | Magic (hex) | Magic (dec) |
+| - | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |------------- |
+| ✅ | KMD | 8232 | 8332 | 3001 | **7770** | 0x8de4eef9 |  2380590841|'
 
 rpcport=8232
 zmqport=8332
@@ -26,5 +26,11 @@ do
    daemon_p2pport=$(echo $daemon_getinfo | jq .p2pport)
    daemon_magic=$(echo $daemon_getinfo | jq .magic)
    daemon_magic_hex=$(printf '%016x' $daemon_magic)
-   echo "| $daemon_name | $daemon_rpcport ($rpcport) | $zmqport | $webport | $daemon_p2pport | 0x${daemon_magic_hex: -8} | $daemon_magic |"
+   # https://stackoverflow.com/questions/3685970/check-if-a-bash-array-contains-a-value
+   if [[ " ${disabled_coins[@]} " =~ " ${i} " ]]; then
+      daemon_flag="❎";
+   else
+      daemon_flag="✅";
+   fi
+   echo "| $daemon_flag | $daemon_name | $daemon_rpcport ($rpcport) | $zmqport | $webport | $daemon_p2pport | 0x${daemon_magic_hex: -8} | $daemon_magic |"
 done

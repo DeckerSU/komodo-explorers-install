@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 CUR_DIR=$(pwd)
 
@@ -23,7 +23,9 @@ do
    daemon_p2pport=$(echo $daemon_getinfo | jq .p2pport)
    daemon_magic=$(echo $daemon_getinfo | jq .magic)
    daemon_magic_hex=$(printf '%016x' $daemon_magic)
-   echo "sudo ufw allow $daemon_p2pport/tcp comment '$daemon_name p2p port'"	
+   if [[ ! " ${disabled_coins[@]} " =~ " ${i} " ]]; then
+      echo "sudo ufw allow $daemon_p2pport/tcp comment '$daemon_name p2p port'"
+   fi
 done
 
 echo "# sudo ufw allow from any to any port 3001:$webport proto tcp comment 'allow insight web ports'"
