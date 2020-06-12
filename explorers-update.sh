@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 STEP_START='\e[1;47;42m'
 STEP_END='\e[0m'
