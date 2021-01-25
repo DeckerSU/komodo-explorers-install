@@ -1,0 +1,235 @@
+From 6b074d520603283c5a50e94649cc84c2086dbc04 Mon Sep 17 00:00:00 2001
+From: DeckerSU <deckersu@protonmail.com>
+Date: Mon, 25 Jan 2021 14:02:04 +0300
+Subject: [PATCH] add Reward info to Insight Explorer by @gaeacodes
+
+---
+ lib/get-komodo-rewards.js | 58 +++++++++++++++++++++++++++++++++++++++
+ lib/index.js              | 10 +++----
+ lib/transactions.js       | 49 +++++++++++++++++++++++++++------
+ 3 files changed, 103 insertions(+), 14 deletions(-)
+ create mode 100644 lib/get-komodo-rewards.js
+
+diff --git a/lib/get-komodo-rewards.js b/lib/get-komodo-rewards.js
+new file mode 100644
+index 0000000..b8bcab2
+--- /dev/null
++++ b/lib/get-komodo-rewards.js
+@@ -0,0 +1,58 @@
++var KOMODO_ENDOFERA = 7777777;
++var LOCKTIME_THRESHOLD = 500000000;
++var MIN_SATOSHIS = 1000000000;
++var ONE_MONTH_CAP_HARDFORK = 1000000;
++var ONE_HOUR = 60;
++var ONE_MONTH = 31 * 24 * 60;
++var ONE_YEAR = 365 * 24 * 60;
++var DEVISOR = 10512000;
++
++var getKomodoRewards = (utxo) => {
++  // Validate types
++  ["tiptime", "locktime", "height", "satoshis"].forEach((property) => {
++    if (typeof utxo[property] !== "number") {
++      throw new TypeError(`\`${property}\` option must be a number.`);
++    }
++  });
++
++  // Destructure UTXO properties
++  //var { tiptime, locktime, height, satoshis } = utxo;
++
++  var tiptime = utxo.tiptime;
++  var locktime = utxo.locktime;
++  var height = utxo.height;
++  var satoshis = utxo.satoshis;
++
++  // Calculate coinage
++  var coinage = Math.floor((tiptime - locktime) / ONE_HOUR);
++
++  // Return early if UTXO is not eligible for rewards
++  if (
++    height >= KOMODO_ENDOFERA ||
++    locktime < LOCKTIME_THRESHOLD ||
++    satoshis < MIN_SATOSHIS ||
++    coinage < ONE_HOUR ||
++    !height
++  ) {
++    return 0;
++  }
++
++  // Cap reward periods
++  var limit = height >= ONE_MONTH_CAP_HARDFORK ? ONE_MONTH : ONE_YEAR;
++  var rewardPeriod = Math.min(coinage, limit);
++
++  // The first hour of coinage should not accrue rewards
++  rewardPeriod -= 59;
++
++  // Calculate rewards
++  var rewards = Math.floor(satoshis / DEVISOR) * rewardPeriod;
++
++  // Ensure reward value is never negative
++  if (rewards < 0) {
++    throw new Error("Reward should never be negative");
++  }
++
++  return rewards;
++};
++
++module.exports = getKomodoRewards;
+diff --git a/lib/index.js b/lib/index.js
+index e078ff3..3dabc8c 100644
+--- a/lib/index.js
++++ b/lib/index.js
+@@ -276,18 +276,18 @@ InsightAPI.prototype.blockEventHandler = function(hashBuffer) {
+ };
+ InsightAPI.prototype.transactionEventHandler = function(txBuffer) {
+   /* fix crash on mailformed zmq reply, like "7261777478" in data */
++  var self = this;
+   try {
+     var tx = new Transaction().fromBuffer(txBuffer);
+   } catch (error) {
+     this.node.log.error(error + ' - ' + txBuffer.toString('hex'));
+     var tx = new Transaction().fromBuffer(Buffer.from("0400008085202f89000000000000000000000000000000000000000000", "hex"));
+   }
+-
+-  var result = this.txController.transformInvTransaction(tx);
+-
+-  for (var i = 0; i < this.subscriptions.inv.length; i++) {
+-    this.subscriptions.inv[i].emit('tx', result);
++  this.txController.transformInvTransaction(tx, function (transformed) {
++    for (var i = 0; i < self.subscriptions.inv.length; i++) {
++      self.subscriptions.inv[i].emit("tx", transformed);
+   }
++  });
+ };
+ 
+ InsightAPI.prototype.subscribe = function(emitter) {
+diff --git a/lib/transactions.js b/lib/transactions.js
+index 4fd2d4e..ee96ef9 100644
+--- a/lib/transactions.js
++++ b/lib/transactions.js
+@@ -5,6 +5,8 @@ var _ = bitcore.deps._;
+ var $ = bitcore.util.preconditions;
+ var Common = require('./common');
+ var async = require('async');
++var getKomodoRewards = require("./get-komodo-rewards");
++var moment = require("moment");
+ 
+ var MAXINT = 0xffffffff; // Math.pow(2, 32) - 1;
+ 
+@@ -59,7 +61,8 @@ TxController.prototype.transformTransaction = function(transaction, options, cal
+   var transformed = {
+     txid: transaction.hash,
+     version: transaction.version,
+-    locktime: transaction.locktime
++    locktime: transaction.locktime,
++    rewardClaimed: transaction.rewardClaimed,
+   };
+ 
+   if(transaction.coinbase) {
+@@ -67,14 +70,16 @@ TxController.prototype.transformTransaction = function(transaction, options, cal
+       {
+         coinbase: transaction.inputs[0].script,
+         sequence: transaction.inputs[0].sequence,
+-        n: 0
+-      }
++        n: 0,
++        timeRewardAccrued: transaction.inputs[0].timeRewardAccrued,
++        rewardClaimed: transaction.inputs[0].rewardClaimed,
++      },
+     ];
+   } else {
+     transformed.vin = transaction.inputs.map(this.transformInput.bind(this, options));
+   }
+ 
+-  transformed.vout = transaction.outputs.map(this.transformOutput.bind(this, options));
++  transformed.vout = transaction.outputs.map(this.transformOutput.bind(this, transaction.locktime, options));
+ 
+   if (transformed.version >= 2) {
+     transformed.vjoinsplit = transaction.joinSplits.map(this.transformJoinSplit.bind(this, options));
+@@ -129,7 +134,9 @@ TxController.prototype.transformInput = function(options, input, index) {
+     txid: input.prevTxId,
+     vout: input.outputIndex,
+     sequence: input.sequence,
+-    n: index
++    n: index,
++    timeRewardAccrued: input.timeRewardAccrued,
++    rewardClaimed: input.rewardClaimed,
+   };
+ 
+   if (!options.noScriptSig) {
+@@ -141,6 +148,7 @@ TxController.prototype.transformInput = function(options, input, index) {
+     }
+   }
+ 
++  //transformed.rewardsAvailableAtTheTimeOfSpend = rewards;
+   transformed.addr = input.address;
+   transformed.valueSat = input.satoshis;
+   transformed.value = input.satoshis / 1e8;
+@@ -152,7 +160,17 @@ TxController.prototype.transformInput = function(options, input, index) {
+   return transformed;
+ };
+ 
+-TxController.prototype.transformOutput = function(options, output, index) {
++TxController.prototype.transformOutput = function(locktime, options, output, index) {
++
++  var rewardData = {
++    tiptime: this.node.services.bitcoind.tipTime || moment().unix(), //Using current time if tiptime is not available
++    locktime: locktime,
++    height: this.node.services.bitcoind.height,
++    satoshis: output.satoshis,
++  };
++
++  var rewards = getKomodoRewards(rewardData);
++
+   var transformed = {
+     value: (output.satoshis / 1e8).toFixed(8),
+     n: index,
+@@ -170,6 +188,7 @@ TxController.prototype.transformOutput = function(options, output, index) {
+     transformed.spentIndex = _.isUndefined(output.spentIndex) ? null : output.spentIndex;
+     transformed.spentHeight = output.spentHeight || null;
+   }
++  transformed.rewardsAvailable = transformed.spentTxId ? 0 : rewards;
+ 
+   if (output.address) {
+     transformed.scriptPubKey.addresses = [output.address];
+@@ -188,8 +207,15 @@ TxController.prototype.transformJoinSplit = function(options, jsdesc, index) {
+   return transformed;
+ };
+ 
+-TxController.prototype.transformInvTransaction = function(transaction) {
++TxController.prototype.transformInvTransaction = function (transaction, func) {
+   var self = this;
++  var transformed;
++  this.node.getDetailedTransaction(
++    transaction.hash,
++    function (err, detailedTransaction) {
++      if (err) {
++        self.common.log.error(err.message + ". Code:" + err.code);
++      }
+ 
+   var valueOut = 0;
+   var vout = [];
+@@ -210,14 +236,19 @@ TxController.prototype.transformInvTransaction = function(transaction) {
+     return seq < MAXINT - 1;
+   });
+ 
+-  var transformed = {
++  transformed = {
++    rewardClaimed: detailedTransaction
++          ? detailedTransaction.rewardClaimed
++          : "N/A",
+     txid: transaction.hash,
+     valueOut: valueOut / 1e8,
+     vout: vout,
+     isRBF: isRBF,
+   };
+ 
+-  return transformed;
++  func(transformed);
++    }
++  );
+ };
+ 
+ TxController.prototype.rawTransaction = function(req, res, next) {
+-- 
+2.29.0
+

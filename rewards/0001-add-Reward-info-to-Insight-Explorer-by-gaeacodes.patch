@@ -1,0 +1,203 @@
+From a71f056d3b13237d36ef84eb9f8f6ba1c5c5de5f Mon Sep 17 00:00:00 2001
+From: DeckerSU <deckersu@protonmail.com>
+Date: Mon, 25 Jan 2021 12:04:00 +0300
+Subject: [PATCH] add Reward info to Insight Explorer by @gaeacodes
+
+---
+ lib/services/bitcoind.js           | 92 +++++++++++++++++++++++++++++-
+ lib/services/get-komodo-rewards.js | 58 +++++++++++++++++++
+ 2 files changed, 147 insertions(+), 3 deletions(-)
+ create mode 100644 lib/services/get-komodo-rewards.js
+
+diff --git a/lib/services/bitcoind.js b/lib/services/bitcoind.js
+index a6d57c89..8c4b4f73 100644
+--- a/lib/services/bitcoind.js
++++ b/lib/services/bitcoind.js
+@@ -13,6 +13,7 @@ var BitcoinRPC = require('bitcoind-rpc');
+ var $ = bitcore.util.preconditions;
+ var _  = bitcore.deps._;
+ var Transaction = bitcore.Transaction;
++var getKomodoRewards = require("./get-komodo-rewards");
+ 
+ var index = require('../');
+ var errors = index.errors;
+@@ -465,6 +466,7 @@ Bitcoin.prototype._initChain = function(callback) {
+       }
+ 
+       self.height = response.result.height;
++      self.tipTime = response.result.time;
+ 
+       self.client.getBlockHash(0, function(err, response) {
+         if (err) {
+@@ -1971,8 +1973,11 @@ Bitcoin.prototype.getDetailedTransaction = function(txid, callback) {
+       callback(null, tx);
+     });
+   } else {
+-    self._tryAllClients(function(client, done) {
+-      client.getRawTransaction(txid, 1, function(err, response) {
++    self._tryAllClients(function (client, done) {
++      async.series(
++        [
++          function (callback) {
++            client.getRawTransaction(txid, 1, function (err, response) {
+         if (err) {
+           return done(self._wrapRPCError(err));
+         }
+@@ -2033,8 +2038,89 @@ Bitcoin.prototype.getDetailedTransaction = function(txid, callback) {
+         // Sapling END
+ 
+         self.transactionDetailedCache.set(txid, tx);
+-        done(null, tx);
++              callback(null, tx);
+       });
++          },
++          function (callback) {
++            var tx = self.transactionDetailedCache.get(txid);
++            var vins = tx.inputs;
++            var functionsArray = [];
++            for (let index = 0; index < vins.length; index++) {
++              functionsArray.push(function (callback) {
++                var prevTxId = vins[index].prevTxId || null;
++                var rewards = 0;
++                if (prevTxId) {
++                  client.getRawTransaction(
++                    prevTxId,
++                    1,
++                    function (err, response) {
++                      if (err) {
++                        return done(self._wrapRPCError(err));
++                      }
++                      var result = response.result;
++                      var rewardData = {
++                        tiptime: tx.blockTimestamp || self.tipTime,
++                        locktime: result.locktime,
++                        height: result.height ? result.height : 1000001,//To satisfy getKomodoRewards constraints on unconfirmed transactions
++                        satoshis: vins[index].satoshis,
++                      };
++                      rewards = getKomodoRewards(rewardData);
++                      callback(null, {
++                        rewards: rewards,
++                        prevTxnLocktime: result.locktime,
++                      });
++                    }
++                  );
++                } else {
++                  callback(null, {
++                    rewards: rewards,
++                    prevTxnLocktime: null,
++                  });
++                }
++              });
++            }
++
++            async.series(functionsArray, function (err, res) {
++              var totalReward = 0;
++
++              //res.forEach((reward) => (totalReward = reward + totalReward));
++              for (let index = 0; index < res.length; index++) {
++                tx.inputs[index].rewardClaimed = res[index].rewards
++                  ? res[index].rewards * 1e-8
++                  : 0;
++
++                var actualTimeRewardAccrued = res[index].prevTxnLocktime
++                  ? (tx.blockTimestamp || self.tipTime) -
++                    res[index].prevTxnLocktime
++                  : null;
++                if (actualTimeRewardAccrued) {
++                  tx.inputs[index].timeRewardAccrued =
++                    actualTimeRewardAccrued < 31 * 24 * 60 * 60
++                      ? actualTimeRewardAccrued
++                      : 31 * 24 * 60 * 60;
++                } else {
++                  tx.inputs[index].timeRewardAccrued = null;
++                }
++
++                totalReward = tx.inputs[index].rewardClaimed + totalReward;
++              }
++              tx.rewardClaimed = totalReward;
++              tx.feeSatoshis =
++                tx.inputSatoshis + tx.rewardClaimed * 1e8 - tx.outputSatoshis;
++              self.transactionDetailedCache.set(txid, tx);
++              callback(null, tx);
++            });
++
++            // self.transactionDetailedCache.set(txid, tx);
++            //  callback(null, tx);
++          },
++        ],
++        function (err, results) {
++          var tx = self.transactionDetailedCache.get(txid);
++
++          done(null, tx);
++        }
++      );
+     }, callback);
+   }
+ };
+diff --git a/lib/services/get-komodo-rewards.js b/lib/services/get-komodo-rewards.js
+new file mode 100644
+index 00000000..b8bcab21
+--- /dev/null
++++ b/lib/services/get-komodo-rewards.js
+@@ -0,0 +1,58 @@
++var KOMODO_ENDOFERA = 7777777;
++var LOCKTIME_THRESHOLD = 500000000;
++var MIN_SATOSHIS = 1000000000;
++var ONE_MONTH_CAP_HARDFORK = 1000000;
++var ONE_HOUR = 60;
++var ONE_MONTH = 31 * 24 * 60;
++var ONE_YEAR = 365 * 24 * 60;
++var DEVISOR = 10512000;
++
++var getKomodoRewards = (utxo) => {
++  // Validate types
++  ["tiptime", "locktime", "height", "satoshis"].forEach((property) => {
++    if (typeof utxo[property] !== "number") {
++      throw new TypeError(`\`${property}\` option must be a number.`);
++    }
++  });
++
++  // Destructure UTXO properties
++  //var { tiptime, locktime, height, satoshis } = utxo;
++
++  var tiptime = utxo.tiptime;
++  var locktime = utxo.locktime;
++  var height = utxo.height;
++  var satoshis = utxo.satoshis;
++
++  // Calculate coinage
++  var coinage = Math.floor((tiptime - locktime) / ONE_HOUR);
++
++  // Return early if UTXO is not eligible for rewards
++  if (
++    height >= KOMODO_ENDOFERA ||
++    locktime < LOCKTIME_THRESHOLD ||
++    satoshis < MIN_SATOSHIS ||
++    coinage < ONE_HOUR ||
++    !height
++  ) {
++    return 0;
++  }
++
++  // Cap reward periods
++  var limit = height >= ONE_MONTH_CAP_HARDFORK ? ONE_MONTH : ONE_YEAR;
++  var rewardPeriod = Math.min(coinage, limit);
++
++  // The first hour of coinage should not accrue rewards
++  rewardPeriod -= 59;
++
++  // Calculate rewards
++  var rewards = Math.floor(satoshis / DEVISOR) * rewardPeriod;
++
++  // Ensure reward value is never negative
++  if (rewards < 0) {
++    throw new Error("Reward should never be negative");
++  }
++
++  return rewards;
++};
++
++module.exports = getKomodoRewards;
+-- 
+2.29.0
+

@@ -1,0 +1,138 @@
+From 0ffbc61b2790cf18bcc533c8d52bd6294818086b Mon Sep 17 00:00:00 2001
+From: DeckerSU <deckersu@protonmail.com>
+Date: Mon, 25 Jan 2021 14:30:32 +0300
+Subject: [PATCH] add Reward info to Insight Explorer by @gaeacodes
+
+---
+ public/src/js/controllers/transactions.js | 11 ++++++++++-
+ public/views/index.html                   |  2 ++
+ public/views/transaction.html             |  4 ++++
+ public/views/transaction/tx.html          | 18 ++++++++++++++----
+ 4 files changed, 30 insertions(+), 5 deletions(-)
+
+diff --git a/public/src/js/controllers/transactions.js b/public/src/js/controllers/transactions.js
+index 504c1b2..3e618c1 100644
+--- a/public/src/js/controllers/transactions.js
++++ b/public/src/js/controllers/transactions.js
+@@ -29,6 +29,13 @@ function($scope, $rootScope, $routeParams, $location, Global, Transaction, Trans
+         notAddr = true;
+       }
+ 
++          // deal with reward duration
++          if (items[i].scriptSig && items[i].timeRewardAccrued) {
++            items[i].timeRewardAccrued = moment
++              .duration(items[i].timeRewardAccrued, "seconds")
++              .humanize();
++          }
++
+       // non standard output
+       if (items[i].scriptPubKey && !items[i].scriptPubKey.addresses) {
+         items[i].scriptPubKey.addresses = ['Unparsed address [' + u++ + ']'];
+@@ -51,6 +58,7 @@ function($scope, $rootScope, $routeParams, $location, Global, Transaction, Trans
+         tmp[addr].count = 0;
+         tmp[addr].addr = addr;
+         tmp[addr].items = [];
++        tmp[addr].totalAvailableRewards = 0;
+       }
+       tmp[addr].isSpent = items[i].spentTxId;
+ 
+@@ -60,7 +68,8 @@ function($scope, $rootScope, $routeParams, $location, Global, Transaction, Trans
+       tmp[addr].valueSat += Math.round(items[i].value * COIN);
+       tmp[addr].items.push(items[i]);
+       tmp[addr].notAddr = notAddr;
+-
++      tmp[addr].totalAvailableRewards =
++            tmp[addr].totalAvailableRewards + items[i].rewardsAvailable * 1e-8;
+       if (items[i].unconfirmedInput)
+         tmp[addr].unconfirmedInput = true;
+ 
+diff --git a/public/views/index.html b/public/views/index.html
+index e91c380..b328891 100644
+--- a/public/views/index.html
++++ b/public/views/index.html
+@@ -43,6 +43,7 @@
+           <thead>
+             <tr>
+               <th>Hash</th>
++              <th class="text-right">Reward Claimed</th>
+               <th class="text-right" translate>Value Out</th>
+             </tr>
+           </thead>
+@@ -52,6 +53,7 @@
+             <td>
+               <a class="ellipsis" href="tx/{{tx.txid}}">{{tx.txid}}</a>
+             </td>
++            <td class="text-right"><span >{{tx.rewardClaimed}}</span></td>
+             <td class="text-right"><span class="ellipsis">{{$root.currency.getConvertion(tx.valueOut)}}</span></td>
+           </tr>
+           </tbody>
+diff --git a/public/views/transaction.html b/public/views/transaction.html
+index 93a5a16..1b203ef 100644
+--- a/public/views/transaction.html
++++ b/public/views/transaction.html
+@@ -87,6 +87,10 @@
+             </div>
+           </td>
+         </tr>
++        <tr data-ng-show="tx.rewardClaimed">
++          <td><strong>Rewards Claimed</strong></td>
++          <td class="text-muted text-right">{{tx.rewardClaimed}}</td>
++        </tr>
+         </tbody>
+       </table>
+     </div>
+diff --git a/public/views/transaction/tx.html b/public/views/transaction/tx.html
+index 152b0fa..dd7a2a8 100644
+--- a/public/views/transaction/tx.html
++++ b/public/views/transaction/tx.html
+@@ -293,6 +293,9 @@
+                 <p class="col-md-11 ellipsis text-muted">{{item}}</p>
+                 <p class="btn-copy" clip-copy="item"></p>
+               </div>
++              <p><strong>Rewards Claimed:</strong><span class="text-muted">  {{vin.rewardClaimed}} KMD</span></p>
++              <p><strong>Time Rewards Accrued:</strong><span class="text-muted"> {{vin.timeRewardAccrued}}</span></p>
++
+           </div>
+         </div>
+         <div class="text-left">
+@@ -341,7 +344,8 @@
+               <div class="ellipsis">
+                 <span data-ng-show="vout.notAddr">{{vout.addr}}</span>
+                 <span class="text-muted" title="Current Komodo Address" data-ng-show="address == $root.currentAddr" data-ng-repeat="address in vout.addr.split(',')">{{vout.addr}}</span>
+-                <a href="address/{{address}}"  data-ng-show="!vout.notAddr && address != $root.currentAddr" data-ng-repeat="address in vout.addr.split(',')">{{address}}</a>
++                <a href="address/{{address}}"  data-ng-show="!vout.notAddr && address != $root.currentAddr" data-ng-repeat="address in vout.addr.split(',')">{{address}}</a><br/>
++              <b>KMD Available to Claim:</b> {{vout.totalAvailableRewards}}
+               </div>
+             </div>
+           </div>
+@@ -371,6 +375,10 @@
+             </div>
+           </div>
+           <div style="padding-left: 0.7em; padding-bottom: 2em; word-wrap:break-word" data-ng-class="{true: 'v_highlight', false: ''}[from_vout == true && v_index == vout.n]">
++              <p class="small">
++                            <strong translate>Rewards Available</strong>
++                            <span class="text-muted">{{vout.rewardsAvailable * 1e-8}} KMD</span>
++                          </p>
+               <p class="small">
+                 <strong translate>Type</strong>
+                 <span class="text-muted">{{vout.scriptPubKey.type}}</span>
+@@ -401,11 +409,13 @@
+ </div>
+ 
+ <div class="line-top row" data-ng-hide="!tx">
+-  <div class="col-xs-6 col-sm-4 col-md-4">
++  <div class="col-xs-6 col-sm-4 col-md-6">
+     <span data-ng-show="!tx.isCoinBase &&  !isNaN(parseFloat(tx.fees))"
+       class="txvalues txvalues-default"><span translate>Fee</span>: {{$root.currency.getConvertion(tx.fees)}} </span>
+-  </div>
+-  <div class="col-xs-6 col-sm-8 col-md-8 text-right">
++  <span data-ng-show="!tx.isCoinBase &&  !isNaN(parseFloat(tx.rewardClaimed))" class="txvalues txvalues
++      txvalues-success"><span
++      translate>Reward:</span> {{tx.rewardClaimed}} KMD </span></div>
++  <div class="col-xs-6 col-sm-8 col-md-6 text-right">
+     <span data-ng-show="tx.confirmations" class="txvalues
+       txvalues-success">{{tx.confirmations}} <span translate>Confirmations</span></span>
+     <span data-ng-show="!tx.confirmations" class="txvalues txvalues-danger" translate>Unconfirmed Transaction!</span>
+-- 
+2.29.0
+
