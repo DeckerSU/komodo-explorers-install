@@ -1,0 +1,129 @@
+/* rebranding addition */
+.navbar-default {
+    background-color: rgb(38, 51, 70);
+}
+.navbar-default a {
+    color: #fff !important;
+}
+.navbar-default a:hover,
+.navbar-default a:active,
+.navbar-default a:focus,
+.explorers--dropdown.open .dropdown-toggle-trigger {
+  color: #41EAD4 !important;
+  background: linear-gradient(to top, #41EAD4 0, #41EAD4 0.25em, transparent 0.25em, transparent 100%)/* !important*/;
+}
+
+#search {
+    border: solid 1px rgba(255, 255, 255, 0.3);
+    box-shadow: none;
+}
+
+#search::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: rgba(255, 255, 255, 0.5);
+    font-style: normal;
+}
+
+#search:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: rgba(255, 255, 255, 0.5);
+    font-style: normal;
+}
+
+#search::-ms-input-placeholder { /* Microsoft Edge */
+    color: rgba(255, 255, 255, 0.5);
+    font-style: normal;
+}
+
+input[type="text"] {
+    color: #fff !important;
+    background: rgb(38, 51, 70) !important;
+}
+
+.status {
+    background-color: #2e527d;
+}
+
+#ngProgress {
+    background-color: #20c997 !important;
+}
+
+.dropdown-menu {
+    border-top: solid 1px rgba(255, 255, 255, 0.2);
+    top: 63px;
+    background: rgb(38, 51, 70);
+    padding-bottom: 10px;
+}
+
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus {
+    background: rgb(38, 51, 70) !important;
+}
+
+.navbar-default .navbar-nav > .open > a,
+.navbar-default .navbar-nav > .open > a:hover,
+.navbar-default .navbar-nav > .open > a:focus {
+  background-color: rgb(38, 51, 70);
+  color: #fff;
+}
+
+.txvalues-success {
+background-color: #17a2b8;
+}
+
+.txvalues-primary {
+background-color: #28a745;
+}
+
+.text-success {
+color: #28a745;
+}
+
+.btn-info {
+background-color: #17a2b8;
+border-color: #17a2b8;
+}
+
+.progress-bar-info {
+background-color: #28a745;
+}
+
+a {
+    color: #2f6983;
+}
+
+a.insight.navbar-brand {
+    background-image: url(../img/komodoplatform-white.png);
+    background-size: 80%;
+    width: 170px;
+    height: 55px;
+    margin-top: 4px;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: block;
+}
+
+.navbar-header a.insight.navbar-brand:hover,
+.navbar-header a.insight.navbar-brand:active,
+.navbar-header a.insight.navbar-brand:focus
+{
+    background-color: rgb(38, 51, 70) !important;
+}
+
+.btn-primary {
+    background-color: #26456b;
+    border: 2px solid #316b8a;
+}
+
+.btn-primary:hover, .dark .btn-primary:active, .dark .btn-primary:focus {
+    color: #fff;
+    background-color: #315888;
+    border-color: #3a68a0;
+}
+
+#powered a.komodoplatform {
+    background-size: 145px;
+    background-color: #26456b;
+    position: relative;
+    top: 5px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-image: url(../img/komodoplatform-white.png);
+}
