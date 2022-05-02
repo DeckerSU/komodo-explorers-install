@@ -40,6 +40,7 @@ input[type="text"] {
 
 .status {
     background-color: #2e527d;
+    margin-right: 0px;
 }
 
 #ngProgress {
@@ -131,4 +132,12 @@ a.insight.navbar-brand {
 .table-hover > tbody > tr:hover > td,
 .table-hover > tbody > tr:hover > th {
   background-color: #f0faff;
+}
+
+.navbar-default .navbar-nav.navbar-right > li > a.dropdown-toggle {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.navbar-nav.navbar-right:last-child {
+    margin-right: -30px;
 }
