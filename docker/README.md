@@ -2,7 +2,7 @@
 
 Docker feature for launch explorers in in early alpha version. Take this into account before usage.
 
-- To start the explorer with Docker you need to build the container with `docker build -f Dockerfile -t kmdexplorer` from the directory containing `docker-entrypoint.sh` and `Dockerfile` files. 
+- To start the explorer with Docker you need to build the container with `docker build -f Dockerfile -t kmdexplorer .` from the directory containing `docker-entrypoint.sh` and `Dockerfile` files. 
 - Then you should launch the container with:
 
 ```
