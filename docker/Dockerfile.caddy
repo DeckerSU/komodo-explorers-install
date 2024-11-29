@@ -1,0 +1,8 @@
+FROM caddy:2.8.4-builder AS builder
+
+# https://caddyserver.com/docs/modules/http.handlers.replace_response
+RUN xcaddy build --with github.com/caddyserver/replace-response
+
+FROM caddy:2.8.4
+
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy

@@ -3,7 +3,10 @@
 # docker compose build --no-cache # rebuild
 services:
   caddy:
-    image: caddy:2.8.4-alpine
+    # image: caddy:2.8.4-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
     restart: unless-stopped
     ports:
       - "80:80"

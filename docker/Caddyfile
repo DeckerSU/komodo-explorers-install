@@ -5,9 +5,11 @@
 	# 'disable_certs' will disable only certificate automation
 	# 'ignore_loaded_certs' will automate certificates even for names which appear on
 	# manually-loaded certs
-
+	order replace after encode
 	auto_https off
 }
+
+# API: https://github.com/bitpay/insight-api/tree/dbfafe8911ebf740df114f6609fc58cf8235f2c6
 
 #http://localhost:3001 {
 #kmd-explorer-example.com {
@@ -35,6 +37,22 @@ http://kmd-explorer-example.com {
 	handle @addrMatcher {
 		header Content-Type "application/json; charset=utf-8"
 		respond `{"pagesTotal":0,"txs":[]}` 200
+	}
+
+	# Matcher for the specific JavaScript file
+	@jsMainFile {
+		path /js/main.min.js
+	}
+
+	# Use the replace directive, https://github.com/caddyserver/replace-response
+	replace @jsMainFile stream {
+		match {
+			header Content-Type application/javascript*
+		}
+		# Replace the second KMD with your TICKER, if it's assetchain
+		`"TAZ":"KMD"` `"TAZ":"KMD"`
+		# TypeError: Cannot read properties of undefined (reading 'config') temp workaround
+		`.directive("clipCopy",function(){return ZeroClipboard.config({moviePath:"/lib/zeroclipboard/ZeroClipboard.swf",trustedDomains:["*"],allowScriptAccess:"always",forceHandCursor:!0}),{restric:"A",scope:{clipCopy:"=clipCopy"},template:'<div class="tooltip fade right in"><div class="tooltip-arrow"></div><div class="tooltip-inner">Copied!</div></div>',link:function(scope,elm){var clip=new ZeroClipboard(elm);clip.on("load",function(client){var onMousedown=function(client){client.setText(scope.clipCopy)};client.on("mousedown",onMousedown),scope.$on("$destroy",function(){client.off("mousedown",onMousedown)})}),clip.on("noFlash wrongflash",function(){return elm.remove()})}}})` ``
 	}
 
 	# https://caddyserver.com/docs/caddyfile/directives/reverse_proxy
