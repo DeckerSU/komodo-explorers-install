@@ -25,13 +25,15 @@ services:
       - .komodo:/home/explorer/.komodo
     environment:
       - WEB_PORT=3002
-      - COIN_NAME=KMD
-      - COIN_RPC_PORT=7771
-      - COIN_P2P_PORT=7770
-      - COIN_RPC_USER=komodo
-      - COIN_RPC_PASS=secret-password
-      - COIN_ZMQ_PORT=7772
-      - COIN_WEB_PORT=3002
+      # Use DAEMON_ARGS for ACs, or COIN_* params for KMD itself (!)
+      - DAEMON_ARGS=-ac_name=DECKER
+      # - COIN_NAME=KMD
+      # - COIN_RPC_PORT=7771
+      # - COIN_P2P_PORT=7770
+      # - COIN_RPC_USER=komodo
+      # - COIN_RPC_PASS=secret-password
+      # - COIN_ZMQ_PORT=7772
+      # - COIN_WEB_PORT=3002
 
     # express-app:
     #   build:
