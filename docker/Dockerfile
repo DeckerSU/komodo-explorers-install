@@ -30,7 +30,7 @@ RUN \
     rm -rf /var/{lib/apt/lists/*,cache/apt/archives/*.deb,tmp/*,log/*} /tmp/*
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
-RUN groupadd -r explorer && useradd -r -g explorer -m explorer &&\
+RUN groupadd -r -g 1000 explorer && useradd -r -u 1000 -g explorer -m explorer &&\
     adduser explorer sudo &&\
     echo "explorer ALL=(ALL:ALL) NOPASSWD: ALL" | tee /etc/sudoers.d/explorer 
 

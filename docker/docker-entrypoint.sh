@@ -150,7 +150,7 @@ _main() {
 # if [ "$1" = 'start' ]; then
     sudo chown -R explorer:explorer /home/explorer/.komodo /home/explorer/.zcash-params
     explorer_note "Fetching ZCash params"
-    ${HOME}/KomodoOcean/zcutil/fetch-params.sh 1>/dev/null 2>/dev/null
+    ${HOME}/bin/fetch-params.sh 1>/dev/null 2>/dev/null
     explorer_note "ZCash params download finished."
     declare -g COIN_NAME COIN_RPC_PORT COIN_P2P_PORT COIN_RPC_USER COIN_RPC_PASS COIN_ZMQ_PORT COIN_WEB_PORT COIN_DESC
     if [ ! -z "$DAEMON_ARGS" ]
@@ -218,6 +218,7 @@ _main() {
     ${NODE_DIR}/${COIN_NAME}-explorer-start.sh &
     explorer_note "Seems everything done, let's wait for catch up"
     #/bin/bash
+    id
     [ "$COIN_NAME" = "KMD" ] && tail -F $HOME/.komodo/debug.log || tail -F $HOME/.komodo/${COIN_NAME}/debug.log
 
 # fi
