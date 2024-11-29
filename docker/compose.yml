@@ -1,0 +1,44 @@
+# docker compose up -d # run 
+# docker compose up --build --force-recreate  # force recreate
+# docker compose build --no-cache # rebuild
+services:
+  caddy:
+    image: caddy:2.8.4-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+      # - "3001:3001"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./log:/var/log/
+      - caddy_data:/data
+      - caddy_config:/config
+  komodo-explorer:
+    build:
+      context: .
+    # ports:
+    #   - "3002:3002"
+    volumes:
+      - .zcash-params:/home/explorer/.zcash-params
+      - .komodo:/home/explorer/.komodo
+    environment:
+      - WEB_PORT=3002
+      - COIN_NAME=KMD
+      - COIN_RPC_PORT=7771
+      - COIN_P2P_PORT=7770
+      - COIN_RPC_USER=komodo
+      - COIN_RPC_PASS=secret-password
+      - COIN_ZMQ_PORT=7772
+      - COIN_WEB_PORT=3002
+
+    # express-app:
+    #   build:
+    #     context: ./express-app
+    #   environment:
+    #     - NODE_ENV=development
+
+volumes:
+  caddy_data:
+  caddy_config:

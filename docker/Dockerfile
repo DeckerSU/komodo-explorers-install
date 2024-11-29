@@ -1,5 +1,5 @@
 FROM ubuntu:20.04
-# Dockerfile for the explorer (q) Decker, 2022-2023
+# Dockerfile for the explorer (q) Decker, 2022-2024
 # https://github.com/DeckerSU/komodo-explorers-install/
 
 # Build: docker build -f Dockerfile -t kmdexplorer .

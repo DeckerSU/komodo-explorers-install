@@ -1,0 +1,36 @@
+{
+    # debug
+    # https://caddyserver.com/docs/caddyfile/options#auto-https
+    # 'off' will disable HTTPS entirely (no cert management or redirects)
+    # 'disable_redirects' will disable only HTTP->HTTPS redirects
+    # 'disable_certs' will disable only certificate automation
+    # 'ignore_loaded_certs' will automate certificates even for names which appear on
+    # manually-loaded certs
+
+    # auto_https off
+}
+
+# http://localhost:3001,
+kmd-explorer-example.com {
+    # https://caddyserver.com/docs/caddyfile/directives/reverse_proxy
+    reverse_proxy komodo-explorer:3002 {
+        # header_up Host {http.request.host}
+        header_up Host {http.reverse_proxy.upstream.hostport}
+        header_up X-Real-IP {http.request.remote}
+        header_up X-Forwarded-For {http.request.remote}
+        header_up X-Forwarded-Port {http.request.port}
+        header_up X-Forwarded-Proto {http.request.scheme}
+        header_up Connection {http.request.header.Connection}
+        header_up Upgrade {http.request.header.Upgrade}
+    }
+
+    log {
+            output file /var/log/kmdexplorer.log {
+                roll_size 1gb
+                roll_keep 5
+                roll_keep_for 720h
+            }
+    }
+
+    tls admin@kmd-explorer-example.com
+}
