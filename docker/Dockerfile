@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 AS komodod-builder
 # Dockerfile for the explorer (q) Decker, 2022-2024
 # https://github.com/DeckerSU/komodo-explorers-install/
 
@@ -15,26 +15,36 @@ RUN \
     apt-get install -y --no-install-recommends libcurl4-gnutls-dev bsdmainutils automake curl libsodium-dev libcurl4-gnutls-dev &&\
     apt-get install -y --no-install-recommends apt-transport-https ca-certificates libzmq3-dev sudo jq python2
 
+# Building komodod
+RUN \
+    git clone -b static-experimental https://github.com/DeckerSU/KomodoOcean &&\
+    cd KomodoOcean &&\
+    ./zcutil/build-no-qt.sh -j$(nproc --all) &&\
+    cd ..
+
+FROM ubuntu:20.04
+RUN \
+    apt-get update && apt-get install -y --no-install-recommends sudo wget ca-certificates jq libzmq3-dev git python2 &&\
+    apt-get install -y --no-install-recommends build-essential &&\
+    apt-get -y clean && apt-get -y autoclean &&\
+    rm -rf /var/{lib/apt/lists/*,cache/apt/archives/*.deb,tmp/*,log/*} /tmp/*
+
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN groupadd -r explorer && useradd -r -g explorer -m explorer &&\
     adduser explorer sudo &&\
     echo "explorer ALL=(ALL:ALL) NOPASSWD: ALL" | tee /etc/sudoers.d/explorer 
+
+RUN mkdir -p /home/explorer/bin
+COPY --from=komodod-builder /KomodoOcean/src/komodod /KomodoOcean/src/komodo-cli /KomodoOcean/zcutil/fetch-params.sh /home/explorer/bin/
+RUN chown -R explorer:explorer /home/explorer/bin
 
 USER explorer
 WORKDIR /home/explorer
 
 ENV PATH="/home/explorer/bin:${PATH}"
 ENV NVM_DIR="/home/explorer/.nvm"
-
-# Building komodod
-RUN \
-    git clone -b static-experimental https://github.com/DeckerSU/KomodoOcean &&\
-    cd KomodoOcean &&\
-    ./zcutil/build-no-qt.sh -j$(nproc --all) &&\
-    cd .. &&\
-    mkdir -p /home/explorer/bin &&\
-    cp ./KomodoOcean/src/komodod ./KomodoOcean/src/komodo-cli ./KomodoOcean/src/komodo-tx ./KomodoOcean/src/wallet-utility ${HOME}/bin &&\
-    echo 'alias k="/home/explorer/bin/komodo-cli "' > ~/.bash_aliases
+# RUN \
+#     echo 'alias k="/home/explorer/bin/komodo-cli "' > ~/.bash_aliases
 
 # Install nvm
 RUN  \
