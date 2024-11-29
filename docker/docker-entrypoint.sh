@@ -104,7 +104,16 @@ EOF
 }
 
 rewrite_daemon_config() {
-    cat <<EOF > $HOME/.komodo/${COIN_NAME}/${COIN_NAME}.conf
+    local config_file
+    if [ "$COIN_NAME" = "KMD" ]; then
+        mkdir -p "$HOME/.komodo"
+        config_file="$HOME/.komodo/komodo.conf"
+    else
+        mkdir -p "$HOME/.komodo/${COIN_NAME}"
+        config_file="$HOME/.komodo/${COIN_NAME}/${COIN_NAME}.conf"
+    fi
+
+    cat <<EOF > "$config_file"
 server=1
 whitelist=127.0.0.1
 txindex=1
@@ -147,11 +156,13 @@ _main() {
     if [ ! -z "$DAEMON_ARGS" ]
     then
         # there is a bug with testnet, when indexes changed in config during reindex, so use regtest (!)
+        explorer_note "Deleting old test data..."
+        find "${HOME}/.komodo" -mindepth 2 -maxdepth 2 -type d -name regtest -exec rm -rf {} +
+
         explorer_note "Starting temporary server"
-        komodod $DAEMON_ARGS --regtest --listen=0 --connect=127.0.0.1 --maxconnections=0 --daemon --reindex=0
+        komodod $DAEMON_ARGS --regtest --listen=0 --connect=127.0.0.1 --maxconnections=0 --daemon --reindex=0 --server=1 --rpcbind=127.0.0.1
         explorer_note "Temporary server started."
-        sleep 5
-        komodo-cli $DAEMON_ARGS --regtest getinfo > /tmp/getinfo.json 2>/dev/null
+        komodo-cli $DAEMON_ARGS -rpcwait --regtest getinfo > /tmp/getinfo.json 2>/dev/null
         explorer_note "Stopping temporary server"
         komodo-cli $DAEMON_ARGS --regtest stop 1>/dev/null 2>/dev/null
         explorer_note "Temporary server stopped"
@@ -195,6 +206,9 @@ _main() {
 
     # rewrite daemon config
     rewrite_daemon_config
+    # explorer_note "Daemon config:"
+    # [ "$COIN_NAME" = "KMD" ] && cat $HOME/.komodo/komodo.conf || cat $HOME/.komodo/${COIN_NAME}/${COIN_NAME}.conf
+
     # start daemon
     komodod $DAEMON_ARGS --daemon
     # write explorer start script
@@ -203,7 +217,8 @@ _main() {
     explorer_note "Starting bitcore in foreground"
     ${NODE_DIR}/${COIN_NAME}-explorer-start.sh &
     explorer_note "Seems everything done, let's wait for catch up"
-    /bin/bash
+    #/bin/bash
+    [ "$COIN_NAME" = "KMD" ] && tail -F $HOME/.komodo/debug.log || tail -F $HOME/.komodo/${COIN_NAME}/debug.log
 
 # fi
 # exec "$@"
