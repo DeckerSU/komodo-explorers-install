@@ -14,8 +14,10 @@
 #http://localhost:3001 {
 #kmd-explorer-example.com {
 http://kmd-explorer-example.com {
+	# https://caddyserver.com/docs/caddyfile/directives/handle
+	# https://caddyserver.com/docs/caddyfile/matchers#syntax
 	# https://caddyserver.com/docs/caddyfile/directives/respond
-	handle /insight-api-komodo/addr/RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA {
+	handle /insight-api-komodo/addr/RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA* {
 		header Content-Type "application/json; charset=utf-8"
 		respond `{"addrStr":"RXL3YXG2ceaB6C5hfJcN4fvmLH2C34knhA","balance":0.00000000,"balanceSat":0,"totalReceived":0.00000000,"totalReceivedSat":0,"totalSent":0.00000000,"totalSentSat":0,"unconfirmedBalance":0,"unconfirmedBalanceSat":0,"unconfirmedTxApperances":0,"txApperances":0}` 200
 	}
