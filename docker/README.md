@@ -16,5 +16,55 @@ docker run -v ${PWD}/.zcash-params:/home/explorer/.zcash-params -v ${PWD}/.komod
 
 - Bitcore will output everything in stdout and, as the container was launched with `-it`, you are now in an interactive bash shell. To keep the container running in the foreground, press Ctrl-P followed by Ctrl-Q.
 
+#### How to find out the port numbers a coin uses, knowing only its launch arguments?
+
+To find out the port numbers (p2pport and rpcport) a coin uses, knowing only its launch arguments, you can use the `komodo-chainparams` utility - https://hub.docker.com/r/deckersu/komodo-chainparams. Run it as:
+
+```
+docker pull deckersu/komodo-chainparams:latest
+
+docker run --rm deckersu/komodo-chainparams:latest <chain_parameters> | jq .
+```
+
+For example:
+
+```
+docker run --rm deckersu/komodo-chainparams:latest -ac_name=BCZERO -ac_supply=9999999999 -ac_end=1 -ac_public=1 -ac_staked=50 -addnode=65.21.52.182 | jq .
+```
+
+And in response you will get something like:
+
+```
+{
+  "chainname": "BCZERO",
+  "magic": 163429333,
+  "magic_bytes": "d5bbbd09",
+  "magic_hex": "09bdbbd5",
+  "p2pport": 45833,
+  "rpcport": 45834
+}
+```
+
+The `p2pport` and `rpcport` values are the port numbers you need.
+
+#### Can you provide a small example of running a specific coin in compose?
+
+Yes, of course:
+
+```yaml
+bczero-explorer:
+  build:
+    context: .
+  ports:
+    - "45833:45833"
+  volumes:
+    - ./BCZERO/.zcash-params:/home/explorer/.zcash-params
+    - ./BCZERO/.komodo:/home/explorer/.komodo
+  environment:
+    - WEB_PORT=3002
+    - DAEMON_ARGS=-ac_name=BCZERO -ac_supply=9999999999 -ac_end=1 -ac_public=1 -ac_staked=50 -addnode=65.21.52.182
+```
+
+ 
 
 
