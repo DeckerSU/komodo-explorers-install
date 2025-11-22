@@ -1,3 +1,5 @@
+**kmdexplorer** is an Insight Explorer for Komodo and assetchains, providing blockchain exploration and transaction tracking capabilities.
+
 ### How to start the explorer with Docker?
 
 Docker feature for launch explorers in in early alpha version. Take this into account before usage.
@@ -9,7 +11,7 @@ Docker feature for launch explorers in in early alpha version. Take this into ac
 docker run -v ${PWD}/.zcash-params:/home/explorer/.zcash-params -v ${PWD}/.komodo:/home/explorer/.komodo -e DAEMON_ARGS="-ac_public=1 -ac_name=KIP0001 -ac_supply=139419284 -ac_staked=10" -e WEB_PORT=3002 -p 127.0.0.1:3002:3002 -it kmdexplorer
 ```
 
-- This will create `.zcash-params` folder and `.komodo` folder in current (!) directory, container will automatically fill it with needed info. All you need is to specify the daemon arguments in `DAEMON_ARGS` environment variable. Currently only assetchains (!) are supported, KMD is untested. Specifying `DAEMON_ARGS` is mandatory.
+- This will create `.zcash-params` folder and `.komodo` folder in current (!) directory, container will automatically fill it with needed info. All you need is to specify the daemon arguments in `DAEMON_ARGS` environment variable. Specifying `DAEMON_ARGS` is mandatory for assetchains.
 - After the container starts up and the daemon performs the necessary block checks, bitcore will start:
 
     ![Running container](./container-001.png)
@@ -63,6 +65,28 @@ bczero-explorer:
   environment:
     - WEB_PORT=3002
     - DAEMON_ARGS=-ac_name=BCZERO -ac_supply=9999999999 -ac_end=1 -ac_public=1 -ac_staked=50 -addnode=65.21.52.182
+```
+
+Example for KMD:
+
+```yaml
+komodo-explorer:
+  build:
+    context: .
+  ports:
+    - "7770:7770"
+  volumes:
+    - .zcash-params:/home/explorer/.zcash-params
+    - .komodo:/home/explorer/.komodo
+  environment:
+    - WEB_PORT=3002
+    - COIN_NAME=KMD
+    - COIN_RPC_PORT=7771
+    - COIN_P2P_PORT=7770
+    - COIN_RPC_USER=komodo
+    - COIN_RPC_PASS=nrQUVgSXG2ICbl0W
+    - COIN_ZMQ_PORT=7772
+    - COIN_WEB_PORT=3002
 ```
 
  
