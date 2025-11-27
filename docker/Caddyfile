@@ -59,12 +59,15 @@ http://kmd-explorer-example.com {
 
 	# https://caddyserver.com/docs/caddyfile/directives/reverse_proxy
 	reverse_proxy komodo-explorer:3002 {
-		# header_up Host {http.request.host}
-		header_up Host {http.reverse_proxy.upstream.hostport}
-		header_up X-Real-IP {http.request.remote}
-		# header_up X-Forwarded-For {http.request.remote}
-		header_up X-Forwarded-Port {http.request.port}
-		# header_up X-Forwarded-Proto {http.request.scheme}
+		# Trust Docker network so upstream sees original client IPs
+		trusted_proxies 172.18.0.0/16
+		# header_up Host {upstream_hostport}
+		header_up X-Real-IP {remote_host}
+		# Insight relies on this header to log the real client IP
+		header_up Cf-Connecting-Ip {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		header_up X-Forwarded-Host {host}
 		header_up Connection {http.request.header.Connection}
 		header_up Upgrade {http.request.header.Upgrade}
 	}
