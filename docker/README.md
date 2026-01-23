@@ -89,6 +89,42 @@ komodo-explorer:
     - COIN_WEB_PORT=3002
 ```
 
- 
+#### How to rebuild the image from scratch?
 
+To rebuild the Docker image from scratch (without using cache), use the `--no-cache` flag:
+
+```bash
+# Rebuild with specific version tag
+docker build -f Dockerfile -t deckersu/kmdexplorer:v0.9.2-rc2 . --no-cache --progress=plain
+
+# Update with latest tag
+docker build -f Dockerfile -t deckersu/kmdexplorer:latest . --progress=plain
+
+# Check
+docker image inspect deckersu/kmdexplorer:latest --format='{{.Id}}'
+docker image inspect deckersu/kmdexplorer:v0.9.2-rc2 --format='{{.Id}}'
+```
+
+The `--no-cache` flag ensures that all layers are rebuilt from scratch, ignoring any cached layers. The `--progress=plain` flag provides detailed output of the build process.
+
+#### How to push the image to Docker Hub?
+
+After rebuilding the image, you can push it to Docker Hub using the following commands:
+
+```bash
+# Login to Docker Hub (if not already logged in)
+docker login
+
+# Push the versioned tag
+docker push deckersu/kmdexplorer:v0.9.2-rc2
+
+# Push the latest tag
+docker push deckersu/kmdexplorer:latest
+```
+
+**Note:** Make sure you have the necessary permissions to push to the `deckersu/kmdexplorer` repository on Docker Hub. If you want to pull fresh base images during the build, add the `--pull` flag:
+
+```bash
+docker build -f Dockerfile -t deckersu/kmdexplorer:v0.9.2-rc2 . --no-cache --pull --progress=plain
+```
 
