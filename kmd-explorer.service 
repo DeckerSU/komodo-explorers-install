@@ -1,0 +1,41 @@
+# /etc/systemd/system/kmd-explorer.service
+# sudo apt-get install libzmq3-dev
+# sudo systemctl daemon-reload
+# sudo systemctl start kmd-explorer
+# sudo systemctl enable kmd-explorer
+# sudo systemctl status kmd-explorer
+# sudo journalctl -u kmd-explorer -f
+# sudo systemctl restart kmd-explorer
+
+[Unit]
+Description=Komodo Explorer Service
+After=network.target
+
+[Service]
+Type=simple
+User=tech
+Group=tech
+WorkingDirectory=/home/tech/komodo-explorers-install/KMD-explorer
+
+# Load nvm and use Node v4
+Environment="NVM_DIR=/home/tech/.nvm"
+ExecStart=/bin/bash -c 'source /home/tech/.nvm/nvm.sh && nvm use v4 && /home/tech/komodo-explorers-install/KMD-explorer/node_modules/bitcore-node-komodo/bin/bitcore-node start'
+
+# Alternative: use wrapper script
+# ExecStart=/home/tech/komodo-explorers-install/KMD-explorer-service.sh
+
+# Auto-restart on failure
+Restart=always
+RestartSec=5
+
+# Logging configuration
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=kmd-explorer
+
+# Resource limits
+LimitNOFILE=1000000
+# MemoryMax=1G
+
+[Install]
+WantedBy=multi-user.target

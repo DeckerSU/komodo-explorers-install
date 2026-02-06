@@ -1,0 +1,35 @@
+# /etc/systemd/system/komodod.service
+# sudo systemctl daemon-reload
+# sudo systemctl start komodod
+# sudo systemctl enable komodod
+# sudo systemctl status komodod
+# sudo journalctl -u komodod -f
+# sudo systemctl restart komodod
+
+[Unit]
+Description=Komodo daemon
+After=network.target
+
+[Service]
+Type=forking
+User=tech
+Group=tech
+ExecStart=/home/tech/KomodoOcean/src/komodod -daemon -conf=/home/tech/.komodo/komodo.conf -pid=/home/tech/.komodo/komodod.pid
+ExecStop=/home/tech/KomodoOcean/src/komodo-cli -conf=/home/tech/.komodo/komodo.conf stop
+PIDFile=/home/tech/.komodo/komodod.pid
+Restart=on-failure
+RestartSec=10
+TimeoutStartSec=120
+TimeoutStopSec=60
+StandardOutput=journal
+StandardError=journal
+LimitNOFILE=1000000
+
+# Security settings
+PrivateTmp=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/home/tech/.komodo
+
+[Install]
+WantedBy=multi-user.target
